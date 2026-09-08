@@ -1,0 +1,17 @@
+# ===== 数学学霸模拟器 · 部署用 .gitignore =====
+
+# 本地运行时数据（含用户排行信息，勿提交）
+server/db.json
+
+# 开发临时脚本（_ 开头）
+_*.js
+
+# 依赖 / 系统文件
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# 本地环境变量
+.env
+.env.local
