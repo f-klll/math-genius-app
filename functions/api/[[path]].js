@@ -89,6 +89,16 @@ async function wxExchange(code, WX_APPID, WX_SECRET) {
   return { openid: t.openid, nickname: u.nickname, avatar: u.headimgurl || "🐱" };
 }
 
+// 内存兜底：当 Cloudflare 未绑定 KV（DB）时，用进程内 Map 暂存，避免 /api 全挂。
+// 注意：内存存储仅在单个 isolate 生命周期内有效，冷启动会清空——仅作为“未配置 KV”时的降级。
+const _mem = new Map();
+function memoryKv() {
+  return {
+    async get(k) { return _mem.has(k) ? _mem.get(k) : null; },
+    async put(k, v) { _mem.set(k, v); },
+  };
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
   const WX_APPID = env.WX_APPID || "";
@@ -99,7 +109,7 @@ export async function onRequest(context) {
 
   if (request.method === "OPTIONS") return json(204, {});
 
-  const DB = env.DB;
+  const DB = env.DB || memoryKv();
   async function loadDb() {
     let db = null;
     try { db = JSON.parse((await DB.get("db")) || "null"); } catch (e) { db = null; }
