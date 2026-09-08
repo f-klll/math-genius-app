@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>数学学霸模拟器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 居中的手机外壳 -->
+  <div class="stage">
+    <div class="phone" id="phone">
+
+      <!-- 状态栏（OS 占位） -->
+      <div class="statusbar">
+        <span class="sb-time">9:41</span>
+        <span class="sb-right">
+          <span class="sb-icon">📶</span>
+          <span class="sb-icon">🔋</span>
+        </span>
+      </div>
+
+      <!-- 可滚动内容区：4 个主屏 + 答题容器 -->
+      <div class="viewport">
+
+        <!-- ===================== 01 首页 ===================== -->
+        <section class="screen active" id="screen-home">
+          <header class="home-head">
+            <!-- 登录态头像（点开登录 / 查看全服排行） -->
+            <button class="login-chip" id="login-chip" type="button">
+              <span class="lc-ava" id="lc-ava">🙂</span>
+              <span class="lc-tx" id="lc-tx">未登录</span>
+            </button>
+            <div class="home-greet">
+              <h1 class="brand" id="home-brand">数学学霸模拟器</h1>
+              <p class="greet" id="home-greet">今天也是伟大的一天（大概）</p>
+              <p class="greet-sub" id="home-sub">数学不会背叛你，它只是不理你。</p>
+            </div>
+            <!-- 可爱吉祥物：圆滚滚柠檬小猫 -->
+            <div class="mascot" id="home-mascot" aria-hidden="true"></div>
+          </header>
+
+          <div class="squiggle" aria-hidden="true">
+            <svg viewBox="0 0 200 16" preserveAspectRatio="none">
+              <path d="M0 8 Q25 0 50 8 T100 8 T150 8 T200 8" fill="none" stroke="var(--accent-deep)" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <!-- 柠檬猫吐槽气泡（搞笑层） -->
+          <div class="mascot-quip" id="mascot-quip"></div>
+
+          <!-- 今日任务卡片 -->
+          <div class="daily-card" id="daily-card">
+            <div class="streak-pill" id="streak-pill">连续打卡 · 7 天</div>
+            <h2 class="daily-title" id="daily-title">今日份 KPI</h2>
+            <p class="daily-desc" id="daily-desc">做 3 题，剩下的交给玄学。</p>
+            <div class="progress-row">
+              <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+              <span class="progress-num" id="progress-num">1/3</span>
+            </div>
+            <button class="cta-btn" id="daily-cta">开始今天的表演 →</button>
+          </div>
+
+          <!-- 段位徽章（点开看九段封神榜） -->
+          <div class="rank-badge" id="rank-badge">
+            <span class="rb-ico" id="rb-ico">🐱</span>
+            <div class="rb-text">
+              <span class="rb-rank" id="rb-rank">薛定谔·既会又不会</span>
+              <span class="rb-elo" id="rb-elo">学霸分 1100 · 第 5 段</span>
+            </div>
+            <span class="rb-go">段位 ›</span>
+          </div>
+
+          <!-- 快捷入口 -->
+          <h3 class="section-title">挑一个开始</h3>
+          <div class="entry-grid" id="entry-grid"></div>
+        </section>
+
+        <!-- ===================== 02 答题练习（无限爬塔 · 学霸分） ===================== -->
+        <section class="screen" id="screen-practice">
+          <header class="sub-head">
+            <button class="back-btn" data-nav="home">‹</button>
+            <h2 class="sub-title" id="practice-title">第 1 关</h2>
+            <span class="elo-chip" id="elo-chip">⚡1100</span>
+            <span class="combo-chip" id="combo-chip" hidden>🔥 连击 x0</span>
+            <span class="timer" id="timer">--</span>
+          </header>
+          <!-- 段位 HUD：当前段位 + 距下一段进度 -->
+          <div class="rank-hud" id="rank-hud">
+            <div class="rank-hud-top">
+              <span class="rank-name" id="rank-name">🐱 薛定谔·既会又不会</span>
+              <span class="rank-opp" id="rank-opp">对手学霸分 1100</span>
+            </div>
+            <div class="rank-track"><div class="rank-fill" id="rank-fill"></div></div>
+            <span class="rank-next" id="rank-next">距 高斯 还差 100</span>
+          </div>
+          <div class="quiz-wrap" id="quiz-wrap"><!-- 题目由 JS 渲染 --></div>
+        </section>
+
+        <!-- ===================== 03 学习报告 ===================== -->
+        <section class="screen" id="screen-report">
+          <header class="sub-head">
+            <button class="back-btn" data-nav="home">‹</button>
+            <h2 class="sub-title">学习报告</h2>
+            <span class="head-spacer"></span>
+          </header>
+          <div class="report-hero">
+            <div class="report-ring" id="report-ring">
+              <span class="ring-num" id="ring-num">86%</span>
+              <span class="ring-label">正确率</span>
+            </div>
+          </div>
+          <div class="chip-row" id="chip-row"></div>
+          <h3 class="section-title">近期战绩</h3>
+          <div class="recent-list" id="recent-list"></div>
+        </section>
+
+        <!-- ===================== 04 功法秘籍（数学模型 · 自带题库） ===================== -->
+        <section class="screen" id="screen-manual">
+          <header class="sub-head">
+            <button class="back-btn" data-nav="home">‹</button>
+            <h2 class="sub-title">功法秘籍</h2>
+            <span class="head-spacer"></span>
+          </header>
+          <!-- 已习得进度 -->
+          <div class="manual-progress" id="manual-progress">
+            <div class="mp-head">
+              <span class="mp-label">已习得武功秘籍</span>
+              <span class="mp-num"><b id="learned-num">0</b> / <span id="learned-total">0</span></span>
+            </div>
+            <div class="mp-track"><div class="mp-fill" id="learned-fill"></div></div>
+          </div>
+          <!-- 今日必修（JS 渲染） -->
+          <div class="feature-card" id="feature-card"></div>
+          <div class="manual-list" id="manual-list"></div>
+        </section>
+
+        <!-- ===================== 05 段位排行（全国 + 地区 · 真实后端） ===================== -->
+        <section class="screen" id="screen-rank">
+          <header class="sub-head">
+            <button class="back-btn" data-nav="home">‹</button>
+            <h2 class="sub-title">段位排行</h2>
+            <span class="head-spacer"></span>
+          </header>
+
+          <!-- 我的排名卡 -->
+          <div class="rank-me" id="rank-me">
+            <div class="rm-ava" id="rm-ava">🙂</div>
+            <div class="rm-body">
+              <span class="rm-name" id="rm-name">未登录</span>
+              <span class="rm-sub" id="rm-sub">登录后查看你的全国 / 地区排名</span>
+            </div>
+            <button class="rm-login" id="rm-login">登录</button>
+            <button class="rm-logout" id="rm-logout" hidden>退出</button>
+          </div>
+
+          <!-- 切换：全国 / 地区 -->
+          <div class="rank-scope">
+            <button class="rs-tab active" data-scope="global">🏆 全国</button>
+            <button class="rs-tab" data-scope="region">📍 地区</button>
+          </div>
+
+          <!-- 地区选择（仅地区榜显示） -->
+          <div class="rank-region-bar" id="rank-region-bar" hidden>
+            <span class="rrb-label">地区</span>
+            <button class="rrb-pick" id="rrb-pick">选择地区 ›</button>
+          </div>
+
+          <!-- 榜单列表 -->
+          <div class="rank-list" id="rank-list">
+            <div class="rank-empty" id="rank-empty">加载中…</div>
+          </div>
+        </section>
+
+      </div><!-- /viewport -->
+
+      <!-- 底部胶囊导航 -->
+      <nav class="tabbar" id="tabbar">
+        <button class="tab active" data-tab="home">
+          <span class="tab-ico">🏠</span>
+          <span class="tab-tx">首页</span>
+        </button>
+        <button class="tab" data-tab="practice">
+          <span class="tab-ico">✏️</span>
+          <span class="tab-tx">答题</span>
+        </button>
+        <button class="tab" data-tab="manual">
+          <span class="tab-ico">📚</span>
+          <span class="tab-tx">秘籍</span>
+        </button>
+        <button class="tab" data-tab="rank">
+          <span class="tab-ico">🏆</span>
+          <span class="tab-tx">排行</span>
+        </button>
+        <button class="tab" data-tab="report">
+          <span class="tab-ico">📊</span>
+          <span class="tab-tx">报告</span>
+        </button>
+      </nav>
+
+      <!-- ============ 趣味瞬间：秒了（答对） ============ -->
+      <div class="moment" id="moment-miao" hidden>
+        <div class="moment-card miao">
+          <div class="moment-ico" id="miao-ico"></div>
+          <h2 class="moment-title">秒了！</h2>
+          <p class="moment-sub" id="moment-sub-miao">手起题落。这道题已经从世界上被你抹掉了。</p>
+          <p class="moment-elo" id="miao-elo"></p>
+          <button class="moment-btn" id="miao-next">下一题 →</button>
+        </div>
+      </div>
+
+      <!-- ============ 趣味瞬间：这题有点意思（答错） ============ -->
+      <div class="moment" id="moment-interesting" hidden>
+        <div class="moment-card interesting">
+          <div class="moment-ico" id="interesting-ico"></div>
+          <h2 class="moment-title interesting-title">这题有点意思啊</h2>
+          <p class="moment-sub" id="interesting-answer">标准答案：—</p>
+          <div class="moment-sol" id="interesting-sol" hidden>
+            <div class="moment-sol-head">📖 解析</div>
+            <p class="moment-sol-idea" id="interesting-sol-idea"></p>
+            <button class="moment-sol-toggle" id="interesting-sol-toggle" type="button">看完整步骤 ▸</button>
+            <ol class="moment-sol-steps" id="interesting-sol-steps" hidden></ol>
+          </div>
+          <p class="moment-sub moment-joke" id="moment-sub-interesting"></p>
+          <p class="moment-elo interesting-elo" id="interesting-elo"></p>
+          <button class="moment-btn interesting-btn" id="interesting-next">下一题 →</button>
+        </div>
+      </div>
+
+      <!-- 搞笑动效层：彩带 + 吐槽 toast -->
+      <div class="confetti-layer" id="confetti-layer"></div>
+      <div class="toast" id="toast" hidden></div>
+
+      <!-- ============ 秘籍详情弹窗（心法 + 题库 + 解析） ============ -->
+      <div class="moment" id="manual-modal" hidden>
+        <div class="moment-card manual-card-lg">
+          <button class="manual-close" id="manual-close">✕</button>
+          <span class="mh-ico" id="manual-ico">🐔</span>
+          <h2 class="moment-title" id="manual-title">鸡兔同笼</h2>
+          <p class="manual-heart" id="manual-heart"></p>
+          <div class="q-list" id="manual-questions"></div>
+        </div>
+      </div>
+
+      <!-- ============ 段位塔（九重段位 · 最小段位起步 · 积分从 0 开始） ============ -->
+      <div class="moment" id="rank-modal" hidden>
+        <div class="moment-card rank-card">
+          <!-- Hero：最小段位起步 + 积分从 0 开始 -->
+          <div class="rt-hero">
+            <span class="rt-pill">最小段位起步</span>
+            <h2 class="rt-hero-title">从最小段位出发，一路爬到上帝</h2>
+            <p class="rt-hero-sub">你现在的段位是全国最小的起点 —— 每刷一题都在升级</p>
+            <div class="rt-score">
+              <div class="rt-score-left">
+                <span class="rt-score-label">积分</span>
+                <span class="rt-score-num" id="rt-score-num">0</span>
+              </div>
+              <div class="rt-score-right">
+                <div class="rt-score-track"><div class="rt-score-fill" id="rt-score-fill"></div></div>
+                <span class="rt-score-hint">从 0 开始，每做对一题都 +分</span>
+              </div>
+            </div>
+            <div class="rt-learned" id="rt-learned"></div>
+            <button class="rt-cta" id="rt-climb">开始爬塔 →</button>
+          </div>
+          <!-- 九重段位塔 -->
+          <div class="rt-tower">
+            <div class="rt-tower-head">
+              <span class="rt-tower-title">九重段位</span>
+              <span class="rt-tower-count">LV.1 起点 → LV.9 上帝</span>
+            </div>
+            <div class="rank-ladder" id="rank-ladder"></div>
+          </div>
+          <button class="moment-btn rank-close" id="rank-close">关闭</button>
+        </div>
+      </div>
+
+      <!-- ============ 登录弹窗（微信 / 手机号 · 真实后端） ============ -->
+      <div class="moment" id="login-modal" hidden>
+        <div class="moment-card login-card">
+          <button class="manual-close" id="login-close">✕</button>
+          <div class="login-ava">🍋</div>
+          <h2 class="moment-title">登录后上榜</h2>
+          <p class="login-tip">登录即加入全国段位排行，和全国学霸一起爬塔。</p>
+          <div class="login-field">
+            <span class="lf-label">昵称</span>
+            <input class="lf-input" id="login-name" type="text" maxlength="12" placeholder="给自己起个响亮的名号" autocomplete="off" />
+          </div>
+          <button class="login-btn login-wx" id="login-wx">💬 微信登录</button>
+          <button class="login-btn login-phone" id="login-phone">📱 手机号一键登录</button>
+          <p class="login-dev" id="login-dev"></p>
+        </div>
+      </div>
+
+      <!-- ============ 地区选择弹窗 ============ -->
+      <div class="moment" id="region-modal" hidden>
+        <div class="moment-card region-card">
+          <button class="manual-close" id="region-close">✕</button>
+          <h2 class="moment-title">选择你的大区</h2>
+          <p class="login-tip">地区榜会和同省 / 同地区的学霸一较高下。</p>
+          <div class="region-grid" id="region-grid"></div>
+        </div>
+      </div>
+
+    </div><!-- /phone -->
+  </div>
+
+  <script src="data.js"></script>
+  <script src="manuals.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
