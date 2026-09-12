@@ -592,11 +592,17 @@
     opts = opts || {};
     const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
     if (auth.token) headers["Authorization"] = "Bearer " + auth.token;
-    const res = await fetch(API_BASE + path, {
-      method: opts.method || "GET",
-      headers,
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
-    });
+    let res;
+    try {
+      res = await fetch(API_BASE + path, {
+        method: opts.method || "GET",
+        headers,
+        body: opts.body ? JSON.stringify(opts.body) : undefined,
+      });
+    } catch (e) {
+      // 网络不可达（离线/APK 内无后端）：返回失败而非抛错，让界面优雅降级
+      return { ok: false, status: 0, data: null };
+    }
     let data = null;
     try { data = await res.json(); } catch (e) { /* ignore */ }
     return { ok: res.ok, status: res.status, data };
@@ -677,7 +683,9 @@
         renderRank();
       }
     } else {
-      $("login-dev").textContent = "登录失败：" + ((r.data && r.data.error) || "未知错误");
+      $("login-dev").textContent = r.status === 0
+        ? "网络不可用：当前为离线模式，刷题进度保存在本机"
+        : "登录失败：" + ((r.data && r.data.error) || "未知错误");
     }
   }
 
@@ -1237,6 +1245,33 @@
     document.querySelectorAll(".rs-tab").forEach((t) =>
       t.addEventListener("click", () => { curScope = t.dataset.scope; renderRank(); }));
   }
+
+  /* ---------------- 开屏页 ---------------- */
+  // 画布固定 1080×1620（与 Ardot 封面一致），等比缩放到铺满屏幕后淡出。
+  (function bootSplash() {
+    const boot = $("boot");
+    const canvas = $("boot-canvas");
+    if (!boot || !canvas) return;
+
+    const fit = () => {
+      const s = Math.min(window.innerWidth / 1080, window.innerHeight / 1620);
+      canvas.style.transform = "scale(" + s + ")";
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    window.addEventListener("orientationchange", fit);
+
+    const START = Date.now();
+    const MIN_SHOW = 900; // 至少展示 0.9s，避免一闪而过
+    const dismiss = () => {
+      setTimeout(() => {
+        boot.classList.add("is-out");
+        setTimeout(() => boot.remove(), 520);
+      }, Math.max(0, MIN_SHOW - (Date.now() - START)));
+    };
+    if (document.readyState === "complete") dismiss();
+    else window.addEventListener("load", dismiss);
+  })();
 
   /* ---------------- 启动 ---------------- */
   renderHome();
