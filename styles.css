@@ -916,10 +916,26 @@ html, body {
 .moment-sol-steps[hidden] { display: none; }
 .moment-sol-steps li { font-size: 13px; line-height: 1.5; color: var(--text); }
 
-/* 小屏（手机姿态）自适应缩放：仅在窄屏时把手机壳等比缩小，避免与桌面布局冲突 */
-@media (max-width: 767px) and (max-height: 860px) {
-  .stage { padding: 0; }
-  .phone { transform: scale(calc((100vh - 24px) / 812)); transform-origin: center; border-radius: 0; border-width: 0; box-shadow: none; }
+/* 手机宽度（真机）：去掉演示用的「手机外壳」，内容铺满整屏。
+   注意：这里**只看宽度**，不要附带高度条件。
+   旧写法 `(max-width: 767px) and (max-height: 860px)` 带了高度条件，
+   而现代长屏手机的 CSS 高度普遍 > 860px，条件不成立 →
+   真机上会原样渲染出「手机里套手机」的外壳（46px 圆角 + 10px 白边 + 阴影），
+   且 375 + 20 边框在 < 395px 宽的机型上还会横向裁切。 */
+@media (max-width: 767px) {
+  .stage { padding: 0; height: 100vh; height: 100dvh; }
+  .phone {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    transform: none;
+    border-radius: 0;
+    border-width: 0;
+    box-shadow: none;
+  }
 }
 
 /* ===================== 搞笑动效层 ===================== */
